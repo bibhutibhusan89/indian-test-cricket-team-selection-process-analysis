@@ -81,28 +81,37 @@ getCricketData <- function (inputID){
     player_dod=paste(player_dod_mmdd , player_dod_year)
     player_age=NA
   }
+  # if the player is still alive
   if(mortal_status=="Current age"){
+    # death flag is ZERO
     died_flag=0
+    # extracting player age information
     player_age=player_info %>%  html_nodes(".ciPlayerinformationtxt:nth-child(3) span") %>%  html_text()
     player_age = gsub('\\n', ' ', player_age)
     player_dod=NA
   }
-  
+  # attaching all the columns together to construct the output data frame
   p_info=cbind(player_name,player_dob_mm,player_dob_dd,player_dob_year,player_dob_city,player_dob_state,died_flag,player_dod,player_age)
+  # returning the constructed output data frame
   return(p_info)
 }
-
+# creating an empty data frame
 result1=data.frame()
+# reading the input player IDs from the input file
+# this file is created from ESPN Cricinfo website to get the list of all players
 player_ids <- read.table("C:/Users/User/Desktop/blog/cricket/player_ids.txt", quote="\"", comment.char="")
 lenthSeq=seq(1:length(player_ids[[1]]))
 for(i in lenthSeq){
+  # iterating the information process for each player
   result1=rbind(result1,getCricketData(player_ids[[1]][i]))
 }
+# constructing the column names for data storage purpose
 colnames(result1)=c("name","birth_month","bith_day","birth_year",
                     "birth_city","birth_state","dead","death_date","age")
 write(x=paste("Name",',',"Birth Month",',',"Birth Day",',',"Birth Year",',',
               "Birth City",',',"Birth State",',',"Dead",',',"Death Date",',',"Age"),
       file="C:\\Users\\user\\Desktop\\blog\\cricket\\output.csv")
+# writing the actual data to the output CSV file
 write(x = paste(result1$name,',',result1$birth_month,',',result1$bith_day,',',
                 result1$birth_year,',',result1$birth_city,',',result1$birth_state,',',
                 result1$dead,',',result1$death_date,',',result1$age),
